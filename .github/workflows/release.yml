@@ -1,4 +1,4 @@
-name: Publish Release (AAR & JAR)
+name: Publish Release (APK, AAR & JAR)
 
 on:
   push:
@@ -58,15 +58,16 @@ jobs:
       - name: Grant Execute Permission to Gradle Wrapper
         run: chmod +x ./gradlew
 
-      - name: Build Black Reflection JAR & Bcore Release AAR
+      - name: Build Black Reflection JAR, Bcore AAR & Full App APK
         run: |
-          ./gradlew :black-reflection:jar :Bcore:assembleRelease --stacktrace --no-daemon
+          ./gradlew :black-reflection:jar :Bcore:assembleRelease :app:assembleRelease --stacktrace --no-daemon
 
       - name: Stage Release Artifacts & Generate Checksums
         run: |
           mkdir -p release-assets
           
-          # Copy generated AAR and JAR
+          # Copy generated APK, AAR and JAR
+          find app/build/outputs/apk/ -type f -name "*.apk" -exec cp {} release-assets/ \;
           find Bcore/build/outputs/aar/ -type f -name "*.aar" -exec cp {} release-assets/ \;
           find black-reflection/build/libs/ -type f -name "*.jar" -exec cp {} release-assets/ \;
           
@@ -80,7 +81,7 @@ jobs:
       - name: Upload Artifacts to Workflow Run
         uses: actions/upload-artifact@v4
         with:
-          name: chiyuan-va-release-binaries
+          name: chiyuan-va-full-release-binaries
           path: release-assets/*
           if-no-files-found: error
 
