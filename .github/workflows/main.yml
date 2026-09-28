@@ -29,46 +29,27 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            cmdline-tools;latest
-            platform-tools
-            platforms;android-35
-            build-tools;35.0.0
-            ndk;29.0.13846066
 
-      - name: Install Android packages
-        shell: bash
-        env:
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      - name: Accept Licenses & Install NDK
         run: |
           yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "ndk;29.0.13846066"
+          sdkmanager --install "ndk;29.0.13846066" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build black-reflection JAR
-        env:
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         run: ./gradlew :black-reflection:jar --stacktrace --no-daemon
 
       - name: Build Bcore release AAR
-        env:
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         run: ./gradlew :Bcore:assembleRelease --stacktrace --no-daemon
 
       - name: Show outputs
-        shell: bash
         run: |
           echo "==== AAR ===="
           find Bcore/build -type f | sort
