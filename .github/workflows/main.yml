@@ -29,10 +29,7 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Licenses & Install NDK
+      - name: Accept Licenses & Install Android SDK/NDK
         run: |
           yes | sdkmanager --licenses >/dev/null 2>&1 || true
           sdkmanager --install "ndk;29.0.13846066" "platforms;android-35" "build-tools;35.0.0"
